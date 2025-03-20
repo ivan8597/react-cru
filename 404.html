@@ -3,7 +3,11 @@
 <head>
   <meta charset="utf-8">
   <script>
-    window.location.replace("/react-cru/");
+    const urlParams = new URLSearchParams(window.location.search);
+    const path = urlParams.get("path");
+    if (path) {
+      window.history.replaceState({}, document.title, path);
+    }
   </script>
 </head>
 <body>
