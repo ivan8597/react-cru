@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { 
   TextField, 
@@ -12,13 +12,13 @@ import {
 } from '@mui/material';
 import { loginUser, AuthState } from '../features/auth/authSlice';
 import { RootState } from '../store';
-import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
+import { UnknownAction, ThunkDispatch } from '@reduxjs/toolkit';
 
 const Login: React.FC = () => {
-  const [username, setUsername] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [validationError, setValidationError] = React.useState('');
-  const dispatch = useDispatch<ThunkDispatch<RootState, unknown, AnyAction>>();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [validationError, setValidationError] = useState('');
+  const dispatch = useDispatch<ThunkDispatch<RootState, unknown, UnknownAction>>();
   const auth = useSelector<RootState, AuthState>((state) => state.auth);
   
   const validateForm = (): boolean => {

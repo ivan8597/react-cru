@@ -1,57 +1,58 @@
 import axios from 'axios';
+import { Document, DocumentFormData } from '../types/documents';
 
 const API_HOST = 'https://test.v5.pryaniky.com';
 
 const api = axios.create({
   baseURL: `${API_HOST}/ru/data/v3/testmethods/docs`,
+  headers: {
+    'Content-Type': 'application/json'
+  }
 });
 
-
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('auth_token');
   if (token) {
     config.headers['x-auth'] = token;
   }
   return config;
 });
 
-export interface Document {
-  id: string;
-  companySigDate: string;
-  companySignatureName: string;
-  documentName: string;
-  documentStatus: string;
-  documentType: string;
-  employeeNumber: string;
-  employeeSigDate: string;
-  employeeSignatureName: string;
-}
-
 export interface LoginResponseData {
   error_code?: number;
   error_text?: string;
-  token?: string;
   data?: {
-    token?: string;
-  } | null;
+    token: string;
+  };
+}
+
+export interface ApiResponse<T> {
+  error_code: number;
+  data: T;
 }
 
 export const login = (username: string, password: string) =>
-  api.post<LoginResponseData>('/login', JSON.stringify({ username, password }), {
-    headers: {
-      'Content-Type': 'application/json'
-    }
+  api.post<LoginResponseData>('/login', { 
+    username: username.trim(), 
+    password 
   });
 
-
 export const getDocuments = () =>
-  api.get<{ data: Document[] }>('/userdocs/get');
+  api.get<ApiResponse<Document[]>>('/userdocs/get');
 
-export const createDocument = (data: Omit<Document, 'id'>) =>
-  api.post<{ data: Document }>('/userdocs/create', data);
+export const createDocument = (data: DocumentFormData) =>
+  api.post<ApiResponse<Document>>('/userdocs/create', {
+    ...data,
+    companySigDate: new Date(data.companySigDate).toISOString(),
+    employeeSigDate: new Date(data.employeeSigDate).toISOString()
+  });
 
-export const updateDocument = (id: string, data: Omit<Document, 'id'>) =>
-  api.post<{ data: Document }>(`/userdocs/set/${id}`, data);
+export const updateDocument = (id: string, data: DocumentFormData) =>
+  api.post<ApiResponse<Document>>(`/userdocs/set/${id}`, {
+    ...data,
+    companySigDate: new Date(data.companySigDate).toISOString(),
+    employeeSigDate: new Date(data.employeeSigDate).toISOString()
+  });
 
 export const deleteDocument = (id: string) =>
-  api.post(`/userdocs/delete/${id}`, {});
+  api.post<ApiResponse<null>>(`/userdocs/delete/${id}`);

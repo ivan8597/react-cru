@@ -30,13 +30,11 @@ export const loginUser = createAsyncThunk(
       
       const data = response.data;
       
-   
       if (data.error_code) {
         throw new Error(data.error_text || 'Ошибка авторизации');
       }
       
-  
-      const token = data.token || data.data?.token;
+      const token = data.data?.token;
       
       if (!token) {
         throw new Error('Токен не найден в ответе сервера');
